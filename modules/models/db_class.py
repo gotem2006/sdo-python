@@ -15,7 +15,13 @@ class Test(Base):
     lengths: Mapped[List["CodeLength"]] = relationship(back_populates="test", cascade="all, delete-orphan")
     constructions: Mapped[List["Construction"]] = relationship(back_populates="test", cascade="all, delete-orphan")
 
-
+class PyTest(Base):
+    __tablename__ = "PyTest"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    description: Mapped[str] = mapped_column()
+    spoiler: Mapped[str] = mapped_column()
+    pyTests: Mapped[str] = mapped_column()
+    
 class Function(Base):
     __tablename__ = "Function"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -62,4 +68,4 @@ class Construction(Base):
     test: Mapped["Test"] = relationship(back_populates="constructions")
 
 
-__all__ = ["Base", "Test", "Formula", "Data", "Function", "Construction", "CodeLength"]
+__all__ = ["Base", "Test", "Formula", "Data", "Function", "Construction", "CodeLength", "PyTest"]

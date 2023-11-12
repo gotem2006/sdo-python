@@ -1,11 +1,11 @@
 from base64 import b64encode
 from typing import Dict, Any, List, Type
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from modules.database.dbconnector import *
-from modules.models.data_model import QueryData, CheckModel
+from modules.models.data_model import QueryData, CheckModel, CheckProgram, PyQueryData
 from modules.models.db_class import *
 from modules.test.test_main import *
 from modules.analize.check_symbols import *
@@ -15,6 +15,7 @@ import shutil
 import random
 import string
 import datetime
+import ast
 
 
 with open("config.json", 'r') as config_file:
@@ -80,7 +81,34 @@ async def insert_task(item: QueryData) -> JSONResponse:
     except Exception as ex:
         return JSONResponse(content={"status": ex.__str__()}, status_code=400)
 
-
 @app.get("/{smth}", status_code=404)
 async def not_found(smth: str) -> HTMLResponse:
     return HTMLResponse(content=f"Error 404, {smth} is not valid gateway", status_code=404)
+
+
+@app.post("/newtaskforPytest")
+async def newTaskForPyTest(item: PyQueryData):
+    answer: str = await insert_pytestVals(item.lab_task)
+    return JSONResponse(content={"status": answer})
+    
+    
+    
+    
+@app.post("/checkbypytest/{id}")
+async def checkTaskByPytest(id, item: CheckProgram):
+    test: Type[PyTest] = await get_pytest_by_id(id)
+    pytest = ""
+    lines = test.pyTests.split("|")
+    for line in lines:
+        if lines.index(line) != (len(lines)-1):
+            pytest += line + "\n"
+        else:
+            pytest += line
+    try:
+        exec(item.code)
+        exec(pytest)
+        return {"result": "Succsec"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    

@@ -54,5 +54,19 @@ class CheckModel(BaseModel):
     file: str = Field(description="File for checking")
 
 
+class CheckProgram(BaseModel):
+    code: str = Field(description="Code for checking")
+
+
+class PyTestModel(BaseModel):
+    task_text: str = Field(description="Task description", max_length=1024)
+    spoiler : str = Field(description="Name for function and her attributes", max_length=1024)
+    py_tests : str = Field(description="Pytest for task", max_length=1024)
+    
+    
+class PyQueryData(BaseModel):
+    lab_task : PyTestModel = Field(description="Test task")
+    
+    
 __all__ = ["TestModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
-           "TestCaseModel", "QueryData", "CheckModel"]
+           "TestCaseModel", "QueryData", "CheckModel", "PyTestModel"]

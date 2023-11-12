@@ -11,9 +11,15 @@ import os
 
 # sleep(15)
 sqlite_database = os.environ.get("DB_CON", "sqlite:///database/test.db")
-engine = create_engine(sqlite_database, echo=True)
+# engine = create_engine("sqlite:///foo.db")
 Base.metadata.create_all(bind=engine)
 
+
+async def add_pydata(*args: PyTest):
+    with Session(autoflush=False, bind=engine) as db:
+        for test_val in args:
+            db.add(test_val)
+        db.commit()
 
 async def add_data(*args: Test) -> None:
     with Session(autoflush=False, bind=engine) as db:
@@ -28,6 +34,12 @@ async def get_all_tests() -> List[Type[Test]]:
         return tests
 
 
+async def get_pytest_by_id(id_val: int):
+    with Session(autoflush=False, bind=engine) as db:
+        pyTest_val: Type[PyTest] = db.query(PyTest).filter(PyTest.id == id_val).first()
+        return pyTest_val
+
+
 async def get_test_by_id(id_val: int) -> Type[Test]:
     with Session(autoflush=False, bind=engine) as db:
         test_val: Type[Test] = db.query(Test).filter(Test.id == id_val).first()
@@ -38,6 +50,11 @@ async def get_test_by_id(id_val: int) -> Type[Test]:
         test_val.lengths
         test_val.constructions
         return test_val
+
+async def insert_pytestVals(data: PyTestModel):
+    pytest: PyTest = PyTest(description=data.task_text, spoiler=data.spoiler, pyTests=data.py_tests)
+    await add_pydata(pytest)
+    return "success"
 
 
 async def insert_vals(data: TestModel) -> str:
@@ -75,4 +92,4 @@ async def insert_vals(data: TestModel) -> str:
     return "success"
 
 
-__all__ = ["get_all_tests", "get_test_by_id", "insert_vals"]
+__all__ = ["get_all_tests", "get_test_by_id", "insert_vals", "insert_pytestVals", "get_pytest_by_id"]
