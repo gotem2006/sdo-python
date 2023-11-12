@@ -11,6 +11,7 @@ import os
 
 # sleep(15)
 sqlite_database = os.environ.get("DB_CON", "sqlite:///database/test.db")
+engine = create_engine(sqlite_database)
 # engine = create_engine("sqlite:///foo.db")
 Base.metadata.create_all(bind=engine)
 
